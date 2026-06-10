@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapBale — Kipindi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .counter {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .counter-label {
+            font-size: 13px;
+            color: #888;
+        }
+        .preview-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .preview-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .preview-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .preview-images img {
+            width: 100%;
+            border-radius: 8px;
+            background: #f0f0f0;
+            min-height: 150px;
+            object-fit: cover;
+        }
+        .quality-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        .quality-pass {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .quality-fail {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .flag-notice {
+            background: #fff3e0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #e65100;
+        }
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+        .btn-danger {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            color: #c62828;
+            border: 2px solid #c62828;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .waiting {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .waiting-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            margin: 0 4px;
+            animation: pulse 1.2s infinite;
+        }
+        .waiting-dot:nth-child(2) { animation-delay: 0.2s; }
+        .waiting-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        .sim-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Kipindi Kinafanya Kazi</div>
+        {% if simulation %}
+        <span class="sim-badge">SIM</span>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <div class="counter" id="counter">000</div>
+        <div class="counter-label">vipande vilivyopigwa picha</div>
+    </div>
+
+    <div class="preview-card" id="preview-card">
+        <div class="preview-label">Kipande cha mwisho</div>
+        <div class="waiting" id="waiting-state">
+            <div>
+                <span class="waiting-dot"></span>
+                <span class="waiting-dot"></span>
+                <span class="waiting-dot"></span>
+            </div>
+            <p style="margin-top: 16px;">Inasubiri kipande...</p>
+        </div>
+        <div id="preview-state" style="display:none;">
+            <div class="preview-images">
+                <img id="front-preview" src="" alt="Mbele">
+                <img id="back-preview" src="" alt="Nyuma">
+            </div>
+            <div id="quality-badge" class="quality-badge quality-pass">
+                Nzuri
+            </div>
+            <div id="flag-notice" class="flag-notice" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-secondary" onclick="reprocessLast()">
+            Rudia
+        </button>
+        <button class="btn btn-primary" onclick="viewGallery()">
+            Gallery
+        </button>
+    </div>
+
+    {% if simulation %}
+    <button class="btn btn-secondary"
+            style="width:100%; margin-bottom: 12px;"
+            onclick="simulateItem()">
+        Simulate Item
+    </button>
+    {% endif %}
+
+    <button class="btn-danger" onclick="endSession()">
+        Maliza Kipindi
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        let currentSessionId = null;
+        let lastItemNumber = 0;
+
+        socket.on("session_started", (data) => {
+            currentSessionId = data.session_id;
+        });
+
+        socket.on("counter_update", (data) => {
+            lastItemNumber = data.item_number;
+            document.getElementById("counter").textContent =
+                String(data.item_number).padStart(3, "0");
+        });
+
+        socket.on("item_captured", (data) => {
+            document.getElementById("waiting-state").style.display = "none";
+            document.getElementById("preview-state").style.display = "block";
+
+            document.getElementById("front-preview").src =
+                "/api/image/" + data.preview_path.replace(/^\//, "");
+            document.getElementById("back-preview").src =
+                "/api/image/" + data.preview_path.replace(/^\//, "");
+
+            const badge = document.getElementById("quality-badge");
+            const flagNotice = document.getElementById("flag-notice");
+
+            if (data.flagged) {
+                badge.className = "quality-badge quality-fail";
+                badge.textContent = "Angalia";
+                flagNotice.style.display = "block";
+                flagNotice.textContent = data.flag_reason;
+            } else {
+                badge.className = "quality-badge quality-pass";
+                badge.textContent = "Nzuri";
+                flagNotice.style.display = "none";
+            }
+        });
+
+        socket.on("session_complete", (data) => {
+            window.location.href = "/complete/" + data.session_id;
+        });
+
+        socket.on("session_error", (data) => {
+            alert("Hitilafu: " + data.message);
+        });
+
+        function endSession() {
+            if (confirm("Maliza kipindi?")) {
+                socket.emit("end_session");
+            }
+        }
+
+        function reprocessLast() {
+            alert("Reprocess: coming in next version");
+        }
+
+        function viewGallery() {
+            if (currentSessionId) {
+                window.location.href = "/gallery/" + currentSessionId;
+            }
+        }
+
+        function simulateItem() {
+            socket.emit("simulate_item");
+        }
+    </script>
+</body>
+</html>
