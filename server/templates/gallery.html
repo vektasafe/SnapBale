@@ -1,134 +1,179 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>SnapBale — Gallery</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #F7F7F7;
+            --surface: #FFFFFF;
+            --primary: #111111;
+            --accent: #00A86B;
+            --danger: #C0392B;
+            --muted: #888888;
+            --border: #E8E8E8;
+            --radius: 14px;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
             min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .back-btn {
-            background: white;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-        }
-        .header-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-        .header-sub {
-            font-size: 13px;
-            color: #888;
-        }
-        .grid {
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            align-items: center;
         }
-        .item-row {
-            background: white;
-            border-radius: 14px;
-            padding: 12px;
+
+        .shell {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .topbar {
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
+        }
+
+        .back {
+            width: 40px;
+            height: 40px;
+            background: var(--surface);
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
             cursor: pointer;
-            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            flex-shrink: 0;
         }
-        .item-number {
-            font-size: 13px;
+
+        .topbar-info { flex: 1; min-width: 0; }
+
+        .topbar-title {
+            font-size: 17px;
             font-weight: 700;
-            color: #888;
-            min-width: 36px;
+            color: var(--primary);
         }
-        .item-thumbs {
+
+        .topbar-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item-row {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .item-num {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            min-width: 32px;
+        }
+
+        .thumbs {
             display: flex;
             gap: 6px;
             flex: 1;
         }
-        .item-thumbs img {
-            width: 60px;
-            height: 60px;
+
+        .thumbs img {
+            width: 52px;
+            height: 52px;
             border-radius: 8px;
             object-fit: cover;
-            background: #f0f0f0;
+            background: var(--bg);
         }
-        .item-status {
-            font-size: 18px;
+
+        .thumb-placeholder {
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            background: var(--bg);
         }
-        .empty-state {
+
+        .item-badge {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .empty {
             text-align: center;
             padding: 60px 20px;
-            color: #aaa;
+            color: var(--muted);
             font-size: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <button class="back-btn"
-                onclick="history.back()">
-            ←
-        </button>
-        <div>
-            <div class="header-title">Gallery</div>
-            <div class="header-sub">
-                {{ session['session_id'] }} —
-                {{ session['item_count'] }} vipande
+    <div class="shell">
+        <div class="topbar">
+            <button class="back" onclick="history.back()">&#8592;</button>
+            <div class="topbar-info">
+                <div class="topbar-title">Gallery</div>
+                <div class="topbar-sub">
+                    {{ session['session_id'] }} &middot;
+                    {{ session['item_count'] }} items
+                </div>
             </div>
         </div>
-    </div>
 
-    {% if items %}
-    <div class="grid">
-        {% for item in items %}
-        <a class="item-row"
-           href="/item/{{ session['session_id'] }}/{{ item['item_number'] }}">
-            <div class="item-number">
-                {{ '%03d' % item['item_number'] }}
-            </div>
-            <div class="item-thumbs">
-                {% if item['front_edited'] %}
-                <img src="/api/image/{{ item['front_edited'].lstrip('/') }}"
-                     alt="Mbele">
-                {% else %}
-                <img src="" alt="Mbele">
-                {% endif %}
-                {% if item['back_edited'] %}
-                <img src="/api/image/{{ item['back_edited'].lstrip('/') }}"
-                     alt="Nyuma">
-                {% else %}
-                <img src="" alt="Nyuma">
-                {% endif %}
-            </div>
-            <div class="item-status">
-                {% if item['flagged'] %}⚠{% else %}✓{% endif %}
-            </div>
-        </a>
-        {% endfor %}
+        {% if items %}
+        <div class="list">
+            {% for item in items %}
+            <a class="item-row"
+               href="/item/{{ session['session_id'] }}/{{ item['item_number'] }}">
+                <div class="item-num">
+                    {{ '%03d' % item['item_number'] }}
+                </div>
+                <div class="thumbs">
+                    {% if item['front_edited'] %}
+                    <img src="/api/image/{{ item['front_edited'].lstrip('/') }}"
+                         alt="Front">
+                    {% else %}
+                    <div class="thumb-placeholder"></div>
+                    {% endif %}
+                    {% if item['back_edited'] %}
+                    <img src="/api/image/{{ item['back_edited'].lstrip('/') }}"
+                         alt="Back">
+                    {% else %}
+                    <div class="thumb-placeholder"></div>
+                    {% endif %}
+                </div>
+                <div class="item-badge">
+                    {% if item['flagged'] %}&#9888;{% else %}&#10003;{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">No items in this session.</div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="empty-state">
-        Hakuna vipande katika kipindi hiki.
-    </div>
-    {% endif %}
-
 </body>
 </html>

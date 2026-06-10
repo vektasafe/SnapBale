@@ -1,217 +1,305 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapBale — Kipindi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>SnapBale — Session</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #F7F7F7;
+            --surface: #FFFFFF;
+            --primary: #111111;
+            --accent: #00A86B;
+            --danger: #C0392B;
+            --text: #111111;
+            --muted: #888888;
+            --border: #E8E8E8;
+            --radius: 14px;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
             min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
+            padding: 16px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
         }
-        .title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a1a;
+
+        .shell {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .counter {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1a1a1a;
+
+        .sim-bar {
+            background: #FFF8E1;
+            border: 1px solid #FFE082;
+            color: #856404;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 7px;
+            border-radius: 8px;
         }
+
+        .counter-block {
+            background: var(--primary);
+            border-radius: var(--radius);
+            padding: 28px 24px 24px;
+            text-align: center;
+        }
+
+        .counter-number {
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #FFFFFF;
+            line-height: 1;
+        }
+
         .counter-label {
             font-size: 13px;
-            color: #888;
+            color: rgba(255,255,255,0.5);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
         }
-        .preview-card {
-            background: white;
-            border-radius: 16px;
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
             padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .preview-label {
-            font-size: 13px;
-            color: #888;
+
+        .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
             margin-bottom: 10px;
         }
-        .preview-images {
+
+        .waiting-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            gap: 12px;
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            animation: blink 1.2s infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0%, 100% { background: var(--border); }
+            50% { background: var(--muted); }
+        }
+
+        .waiting-text {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .preview-state { display: none; }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .preview-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--bg);
+        }
+
+        .preview-caption {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .quality-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .quality-pass {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .quality-fail {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .flag-notice {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #FFF3E0;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #E65100;
+            display: none;
+        }
+
+        .row-btns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
-        .preview-images img {
-            width: 100%;
-            border-radius: 8px;
-            background: #f0f0f0;
-            min-height: 150px;
-            object-fit: cover;
-        }
-        .quality-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-top: 10px;
-        }
-        .quality-pass {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        .quality-fail {
-            background: #fff3e0;
-            color: #e65100;
-        }
-        .flag-notice {
-            background: #fff3e0;
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 10px;
-            font-size: 13px;
-            color: #e65100;
-        }
-        .actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
+
         .btn {
             padding: 14px;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius);
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            transition: opacity 0.15s;
         }
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #1a1a1a;
-        }
-        .btn-primary {
-            background: #1a1a1a;
-            color: white;
-        }
-        .btn-danger {
+
+        .btn:active { opacity: 0.8; }
+        .btn-ghost { background: var(--bg); color: var(--primary); }
+        .btn-solid { background: var(--primary); color: #FFF; }
+
+        .btn-sim {
             width: 100%;
-            padding: 16px;
-            background: white;
-            color: #c62828;
-            border: 2px solid #c62828;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 14px;
+            background: #E3F2FD;
+            color: #1565C0;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
-        .waiting {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
+
+        .btn-end {
+            width: 100%;
+            padding: 16px;
+            background: var(--surface);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
         }
-        .waiting-dot {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #1a1a1a;
-            margin: 0 4px;
-            animation: pulse 1.2s infinite;
-        }
-        .waiting-dot:nth-child(2) { animation-delay: 0.2s; }
-        .waiting-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        .sim-badge {
-            background: #fff3cd;
-            color: #856404;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
+
+        .error-bar {
+            background: #FFEBEE;
+            border-left: 3px solid var(--danger);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--danger);
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="title">Kipindi Kinafanya Kazi</div>
+    <div class="shell">
         {% if simulation %}
-        <span class="sim-badge">SIM</span>
+        <div class="sim-bar">Simulation Mode</div>
         {% endif %}
-    </div>
 
-    <div style="margin-bottom: 20px;">
-        <div class="counter" id="counter">000</div>
-        <div class="counter-label">vipande vilivyopigwa picha</div>
-    </div>
-
-    <div class="preview-card" id="preview-card">
-        <div class="preview-label">Kipande cha mwisho</div>
-        <div class="waiting" id="waiting-state">
-            <div>
-                <span class="waiting-dot"></span>
-                <span class="waiting-dot"></span>
-                <span class="waiting-dot"></span>
-            </div>
-            <p style="margin-top: 16px;">Inasubiri kipande...</p>
+        <div class="counter-block">
+            <div class="counter-number" id="counter">000</div>
+            <div class="counter-label">ITEMS PHOTOGRAPHED</div>
         </div>
-        <div id="preview-state" style="display:none;">
-            <div class="preview-images">
-                <img id="front-preview" src="" alt="Mbele">
-                <img id="back-preview" src="" alt="Nyuma">
+
+        <div class="card">
+            <div class="card-label">Last Item</div>
+
+            <div class="waiting-state" id="waiting-state">
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="waiting-text">Waiting for item...</div>
             </div>
-            <div id="quality-badge" class="quality-badge quality-pass">
-                Nzuri
+
+            <div class="preview-state" id="preview-state">
+                <div class="preview-grid">
+                    <div>
+                        <img id="front-preview" src="" alt="Front">
+                        <div class="preview-caption">Front</div>
+                    </div>
+                    <div>
+                        <img id="back-preview" src="" alt="Back">
+                        <div class="preview-caption">Back</div>
+                    </div>
+                </div>
+                <div id="quality-tag" class="quality-tag quality-pass">
+                    Good
+                </div>
+                <div id="flag-notice" class="flag-notice"></div>
             </div>
-            <div id="flag-notice" class="flag-notice" style="display:none;"></div>
         </div>
-    </div>
 
-    <div class="actions">
-        <button class="btn btn-secondary" onclick="reprocessLast()">
-            Rudia
+        <div id="error-bar" class="error-bar"></div>
+
+        <div class="row-btns">
+            <button class="btn btn-ghost" onclick="viewGallery()">Gallery</button>
+            <button class="btn btn-solid" onclick="reprocess()">Reprocess</button>
+        </div>
+
+        {% if simulation %}
+        <button class="btn-sim" onclick="simulateItem()">
+            Simulate Item
         </button>
-        <button class="btn btn-primary" onclick="viewGallery()">
-            Gallery
+        {% endif %}
+
+        <button class="btn-end" onclick="endSession()">
+            End Session
         </button>
     </div>
-
-    {% if simulation %}
-    <button class="btn btn-secondary"
-            style="width:100%; margin-bottom: 12px;"
-            onclick="simulateItem()">
-        Simulate Item
-    </button>
-    {% endif %}
-
-    <button class="btn-danger" onclick="endSession()">
-        Maliza Kipindi
-    </button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         const socket = io();
         let currentSessionId = null;
-        let lastItemNumber = 0;
 
         socket.on("session_started", (data) => {
             currentSessionId = data.session_id;
         });
 
         socket.on("counter_update", (data) => {
-            lastItemNumber = data.item_number;
             document.getElementById("counter").textContent =
                 String(data.item_number).padStart(3, "0");
         });
@@ -220,23 +308,23 @@
             document.getElementById("waiting-state").style.display = "none";
             document.getElementById("preview-state").style.display = "block";
 
-            document.getElementById("front-preview").src =
-                "/api/image/" + data.preview_path.replace(/^\//, "");
-            document.getElementById("back-preview").src =
-                "/api/image/" + data.preview_path.replace(/^\//, "");
+            const previewUrl = "/api/image/" +
+                data.preview_path.replace(/^\//, "");
+            document.getElementById("front-preview").src = previewUrl;
+            document.getElementById("back-preview").src = previewUrl;
 
-            const badge = document.getElementById("quality-badge");
-            const flagNotice = document.getElementById("flag-notice");
+            const tag = document.getElementById("quality-tag");
+            const flag = document.getElementById("flag-notice");
 
             if (data.flagged) {
-                badge.className = "quality-badge quality-fail";
-                badge.textContent = "Angalia";
-                flagNotice.style.display = "block";
-                flagNotice.textContent = data.flag_reason;
+                tag.className = "quality-tag quality-fail";
+                tag.textContent = "Check image";
+                flag.style.display = "block";
+                flag.textContent = data.flag_reason;
             } else {
-                badge.className = "quality-badge quality-pass";
-                badge.textContent = "Nzuri";
-                flagNotice.style.display = "none";
+                tag.className = "quality-tag quality-pass";
+                tag.textContent = "Good";
+                flag.style.display = "none";
             }
         });
 
@@ -245,22 +333,26 @@
         });
 
         socket.on("session_error", (data) => {
-            alert("Hitilafu: " + data.message);
+            const bar = document.getElementById("error-bar");
+            bar.style.display = "block";
+            bar.textContent = "Error: " + data.message;
         });
 
         function endSession() {
-            if (confirm("Maliza kipindi?")) {
+            if (confirm("End this session?")) {
                 socket.emit("end_session");
             }
         }
 
-        function reprocessLast() {
+        function reprocess() {
             alert("Reprocess: coming in next version");
         }
 
         function viewGallery() {
             if (currentSessionId) {
                 window.location.href = "/gallery/" + currentSessionId;
+            } else {
+                alert("No active session");
             }
         }
 

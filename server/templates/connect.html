@@ -1,131 +1,168 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>SnapBale</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #F7F7F7;
+            --surface: #FFFFFF;
+            --primary: #111111;
+            --accent: #00A86B;
+            --danger: #C0392B;
+            --text: #111111;
+            --muted: #888888;
+            --border: #E8E8E8;
+            --radius: 14px;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px 16px;
         }
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px 24px;
+
+        .shell {
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            max-width: 480px;
+        }
+
+        .sim-bar {
+            background: #FFF8E1;
+            border: 1px solid #FFE082;
+            color: #856404;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 8px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 36px 24px 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .wordmark {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--primary);
             text-align: center;
         }
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
+
         .tagline {
             font-size: 14px;
-            color: #888;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 4px;
             margin-bottom: 32px;
         }
-        .status {
+
+        .status-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             margin-bottom: 32px;
-            font-size: 15px;
-            color: #2e7d32;
-            font-weight: 500;
         }
+
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
-            background: #2e7d32;
+            background: var(--accent);
         }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .notice {
+            background: #FFF8E1;
+            border-left: 3px solid #FFB300;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #5D4037;
+            line-height: 1.5;
+        }
+
         .btn-start {
+            display: block;
             width: 100%;
             padding: 18px;
-            background: #1a1a1a;
-            color: white;
+            background: var(--primary);
+            color: #FFFFFF;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
+            border-radius: var(--radius);
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
             cursor: pointer;
-            margin-bottom: 12px;
+            transition: opacity 0.15s;
         }
-        .btn-start:active { background: #333; }
-        .storage-info {
-            font-size: 13px;
-            color: #aaa;
-            margin-top: 24px;
-        }
-        .sim-badge {
-            background: #fff3cd;
-            color: #856404;
-            padding: 6px 12px;
-            border-radius: 8px;
+
+        .btn-start:active { opacity: 0.85; }
+
+        .storage-note {
+            text-align: center;
             font-size: 12px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .incomplete-notice {
-            background: #fff3cd;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #856404;
-            text-align: left;
+            color: var(--muted);
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="shell">
         {% if simulation %}
-        <div class="sim-badge">Simulation Mode</div>
+        <div class="sim-bar">Simulation Mode</div>
         {% endif %}
 
-        <div class="logo">SnapBale</div>
-        <div class="tagline">Piga picha. Uza haraka.</div>
+        <div class="card">
+            <div class="wordmark">SnapBale</div>
+            <div class="tagline">Photograph. List. Sell.</div>
 
-        <div class="status">
-            <div class="status-dot"></div>
-            Imeunganishwa
-        </div>
+            <div class="status-row">
+                <div class="status-dot"></div>
+                <div class="status-text">Connected</div>
+            </div>
 
-        {% if incomplete_sessions %}
-        <div class="incomplete-notice">
-            Kipindi kisichokamilika kilipatikana.
-            Picha zilizopigwa ziko salama.
-        </div>
-        {% endif %}
+            {% if incomplete_sessions %}
+            <div class="notice">
+                An incomplete session was found. Your images are safe.
+            </div>
+            {% endif %}
 
-        <button class="btn-start" onclick="startSession()">
-            Anza Kipindi
-        </button>
+            <button class="btn-start" onclick="startSession()">
+                Start Session
+            </button>
 
-        <div class="storage-info">
-            Nafasi iliyobaki: {{ free_gb }} GB
+            <div class="storage-note">
+                {{ free_gb }} GB free
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         const socket = io();
-        socket.on("connect", () => {
-            console.log("Connected to SnapBale");
-        });
         socket.on("session_starting", () => {
             window.location.href = "/session";
         });

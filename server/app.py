@@ -3,6 +3,7 @@
 # Author: James Kabingu
 
 import logging
+import os
 from flask import Flask
 from flask_socketio import SocketIO
 from config import SIMULATION_MODE
@@ -13,7 +14,7 @@ socketio = SocketIO()
 
 
 def create_app():
-    app = Flask(__name__, template_folder="templates")
+    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), "templates"))
     app.config["SECRET_KEY"] = "snapbale-v1-secret"
     app.config["SIMULATION_MODE"] = SIMULATION_MODE
 
