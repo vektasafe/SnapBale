@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapBale — Gallery</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            background: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .header-sub {
+            font-size: 13px;
+            color: #888;
+        }
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .item-row {
+            background: white;
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .item-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: #888;
+            min-width: 36px;
+        }
+        .item-thumbs {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+        }
+        .item-thumbs img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        .item-status {
+            font-size: 18px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn"
+                onclick="history.back()">
+            ←
+        </button>
+        <div>
+            <div class="header-title">Gallery</div>
+            <div class="header-sub">
+                {{ session['session_id'] }} —
+                {{ session['item_count'] }} vipande
+            </div>
+        </div>
+    </div>
+
+    {% if items %}
+    <div class="grid">
+        {% for item in items %}
+        <a class="item-row"
+           href="/item/{{ session['session_id'] }}/{{ item['item_number'] }}">
+            <div class="item-number">
+                {{ '%03d' % item['item_number'] }}
+            </div>
+            <div class="item-thumbs">
+                {% if item['front_edited'] %}
+                <img src="/api/image/{{ item['front_edited'].lstrip('/') }}"
+                     alt="Mbele">
+                {% else %}
+                <img src="" alt="Mbele">
+                {% endif %}
+                {% if item['back_edited'] %}
+                <img src="/api/image/{{ item['back_edited'].lstrip('/') }}"
+                     alt="Nyuma">
+                {% else %}
+                <img src="" alt="Nyuma">
+                {% endif %}
+            </div>
+            <div class="item-status">
+                {% if item['flagged'] %}⚠{% else %}✓{% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        Hakuna vipande katika kipindi hiki.
+    </div>
+    {% endif %}
+
+</body>
+</html>

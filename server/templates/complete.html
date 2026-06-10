@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapBale — Kipindi Kimekamilika</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { color: #888; }
+        .stat-value { font-weight: 600; color: #1a1a1a; }
+        .stat-warn { font-weight: 600; color: #e65100; }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .btn-primary { background: #1a1a1a; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #1a1a1a; }
+        .btn-outline {
+            background: white;
+            color: #1a1a1a;
+            border: 2px solid #e0e0e0;
+        }
+        .download-progress {
+            display: none;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" style="text-align:center;">
+        <div class="success-icon">✓</div>
+        <div class="title">Kipindi Kimekamilika</div>
+        <div class="subtitle">{{ session['session_id'] }}</div>
+    </div>
+
+    <div class="card">
+        <div class="stat-row">
+            <span class="stat-label">Vipande vilivyopigwa picha</span>
+            <span class="stat-value">{{ session['item_count'] }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Vipande vilivyoflagiwa</span>
+            {% if flagged_count > 0 %}
+            <span class="stat-warn">{{ flagged_count }}</span>
+            {% else %}
+            <span class="stat-value">0</span>
+            {% endif %}
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Hali</span>
+            <span class="stat-value">Imekamilika</span>
+        </div>
+    </div>
+
+    {% if flagged_count > 0 %}
+    <div class="card" style="background:#fff3e0;">
+        <div style="font-size:14px; color:#e65100; font-weight:600;
+                    margin-bottom:8px;">
+            Vipande {{ flagged_count }} vimeflagiwa
+        </div>
+        <div style="font-size:13px; color:#888;">
+            Baadhi ya picha hazikupita ukaguzi wa ubora.
+            Angalia gallery ili uone na kupiga tena ikiwa inahitajika.
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="/api/download/{{ session['session_id'] }}" download>
+        <button class="btn btn-primary">
+            Pakua Picha Zote
+        </button>
+    </a>
+
+    <button class="btn btn-secondary"
+            onclick="window.location.href='/gallery/{{ session['session_id'] }}'">
+        Tazama Gallery
+    </button>
+
+    <button class="btn btn-outline"
+            onclick="window.location.href='/'">
+        Anza Kipindi Kipya
+    </button>
+
+</body>
+</html>
