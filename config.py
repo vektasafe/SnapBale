@@ -72,7 +72,7 @@ if SIMULATION_MODE:
 # -----------------------------------------------
 # IMAGE PROCESSING
 # -----------------------------------------------
-BLUR_THRESHOLD = 100         # Laplacian variance threshold
+BLUR_THRESHOLD = 0         # Laplacian variance threshold
                              # Below this = blurry, flag item
 MIN_ITEM_COVERAGE = 0.20     # Item must cover 20% of frame
                              # Below this = misaligned, flag item
