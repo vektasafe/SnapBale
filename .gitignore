@@ -1,0 +1,19 @@
+# Session data and images
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# rembg model cache
+~/.u2net/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
